@@ -4,7 +4,7 @@
 
 ;; Author: Matthew Silver (msilver@vectranetworks.com)
 ;; Homepage: https://github.com/matthewrsilver/aql-mode
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Version: 0.3
 ;; Created: July 26, 2016
 ;; License: MIT License -- see LICENSE.txt
@@ -25,11 +25,6 @@
   :type 'hook
   :group 'aql)
 
-;; Indentation
-;;
-;; The indentation component consists of  a single function aql-indent-line that
-;; is called whenever emacs needs to determine how to indent a line.
-
 (defcustom aql-tab-width
   (cond ((boundp 'tab-width)
          tab-width)
@@ -37,7 +32,7 @@
         ((boundp 'default-tab-width)
          default-tab-width)
         (t nil))
-  "Tab width for aql-mode."
+  "Tab width for `aql-mode'."
   :type 'integer
   :group 'aql)
 
@@ -62,8 +57,8 @@
 
 ;; Syntax Highlighting
 ;;
-;; This  mode inherits  from  c-mode,  which handles  the  comments and  strings
-;; nicely.  The  keywords,  constants,  etc.  are all  specific  for  AQL.  Also
+;; This mode inherits from `c-mode', which handles the comments and strings
+;; nicely. The keywords, constants, etc. are all specific for AQL. Also
 ;; highlighted are numeric literals, and AQL's special bind variables.
 
 (defvar aql-keywords
@@ -140,8 +135,12 @@
 ;; utility regexes
 (defvar aql-close-brace-regexp "^[ \t]*[)}]")
 (defvar aql-block-indenting-regexp "^[ \t]*\\(FOR\\|for\\|.*[({]$\\)")
-(defvar aql-empty-regexp  "^[\s]*$")
+(defvar aql-empty-regexp "^[\s]*$")
 
+;; Indentation
+;;
+;; The indentation component consists of a single function `aql-indent-line' that
+;; is called whenever emacs needs to determine how to indent a line.
 ;;;###autoload
 (defun aql-indent-line ()
   "Indent current line as AQL code."
@@ -152,7 +151,7 @@
       (indent-line-to 0)
     (let ((need-line t)
           (cur-indent nil))
-      ;; if the  current line is only  a close brace,  then we can indent  it by
+      ;; if the current line is only a close brace, then we can indent it by
       ;; subtracting the tab-width from the indent of the previous line
       (if (looking-at aql-close-brace-regexp)
           (progn
@@ -163,13 +162,13 @@
             (when (< cur-indent 0)
               (setq cur-indent 0)))
         ;; else (i.e. if the current line is not solely a close brace) move back
-        ;; through the  previous lines  until a  non-empty, non-comment  line is
+        ;; through the previous lines until a non-empty, non-comment line is
         ;; found, and base the current line's indentation on it
         (save-excursion
           (while need-line
             (forward-line -1)
-            ;; if the line is a block-initiating line  -- e.g. it is a for loop,
-            ;; or an open brace -- then  the current line should be indented one
+            ;; if the line is a block-initiating line -- e.g. it is a for loop,
+            ;; or an open brace -- then the current line should be indented one
             ;; tab-width forward
             (cond ((looking-at aql-block-indenting-regexp)
                    (progn
@@ -184,7 +183,7 @@
                   ;; else if this is the first line then just exit the loop
                   ((bobp)
                    (setq need-line nil))
-                  ;; finally, there  must be text on this line... indent the
+                  ;; finally, there must be text on this line... indent the
                   ;; current line to match it!
                   (t
                    (progn
