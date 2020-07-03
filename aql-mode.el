@@ -139,28 +139,20 @@
 
 ;; Indentation
 ;;
-;; The indentation component consists of a single function `aql-indent-line' that
-;; is called whenever emacs needs to determine how to indent a line.
-;;;###autoload
-(defun aql-indent-line ()
-  "Indent current line as AQL code."
-  (interactive)
-  (beginning-of-line)
-  ;; If the point is at the beginning of the buffer indent line to column 0
+
+(defun aql--indentation ()
+  "Some doc."
   (if (bobp)
-      (indent-line-to 0)
+      0
     (let ((need-line t)
           (cur-indent nil))
       ;; if the current line is only a close brace, then we can indent it by
       ;; subtracting the tab-width from the indent of the previous line
       (if (looking-at aql-close-brace-regexp)
-          (progn
-            (save-excursion
-              (forward-line -1)
-              (setq cur-indent (- (current-indentation) aql-tab-width)))
-            ;; rectify cur-indent
-            (when (< cur-indent 0)
-              (setq cur-indent 0)))
+          (save-excursion
+            (forward-line -1)
+            (setq cur-indent (max 0 (- (current-indentation)
+                                       aql-tab-width))))
         ;; else (i.e. if the current line is not solely a close brace) move back
         ;; through the previous lines until a non-empty, non-comment line is
         ;; found, and base the current line's indentation on it
@@ -174,11 +166,10 @@
                    (progn
                      (setq cur-indent (+ (current-indentation) aql-tab-width))
                      (setq need-line nil)))
-                  ;; else if the line is totally empty, do nothing
-                  ((looking-at aql-empty-regexp)
-                   (setq need-line t))
-                  ;; else if the line is a comment, do nothing
-                  ((nth 4 (syntax-ppss))
+                  ;; else if the line is totally empty
+                  ((or (looking-at aql-empty-regexp)
+                       ;; or if the line is a comment, do nothing
+                       (nth 4 (syntax-ppss)))
                    (setq need-line t))
                   ;; else if this is the first line then just exit the loop
                   ((bobp)
@@ -192,8 +183,17 @@
 
       ;; once the search for an informative line has been completed, we'll use
       ;; the value of cur-indent to actually indent the line
-      (indent-line-to
-       (or cur-indent 0)))))
+      (or cur-indent 0))))
+
+;; The indentation component consists of a single function `aql-indent-line' that
+;; is called whenever emacs needs to determine how to indent a line.
+;;;###autoload
+(defun aql-indent-line ()
+  "Indent current line as AQL code."
+  (interactive)
+  (beginning-of-line)
+  ;; If the point is at the beginning of the buffer indent line to column 0
+  (indent-line-to (aql--indentation)))
 
 ;; Associate categories with faces
 (defvar aql-font-lock-keywords
