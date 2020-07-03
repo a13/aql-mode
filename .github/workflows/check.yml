@@ -28,5 +28,5 @@ jobs:
     - uses: leotaku/elisp-check@master
       with:
         check: melpa
-        file: init.el
+        file: aql-mode.el
         ignore_warnings: ${{ matrix.ignore_warnings }}
