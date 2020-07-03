@@ -34,7 +34,9 @@ to automatically use aql mode for some other extension (say ".arango") update `~
 Configuration
 -------------
 
-The tab width is currently set to `default-tab-width`, but can be configured by adding the following line to `~/.emacs`:
+The tab width is currently set to `tab-width`, but can be configured by customizing `aql-tab-width`
+
+adding the following line to `~/.emacs`:
 
 ```
 (setq aql-tab-width 4) ;; change 4 to whatever you'd like

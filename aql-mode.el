@@ -174,19 +174,19 @@
             (cond ((looking-at aql-block-indenting-regexp)
                    (progn
                      (setq cur-indent (+ (current-indentation) aql-tab-width))
-                     (setq need-line nil))
-                   ;; else if the line is totally empty, do nothing
-                   (looking-at aql-empty-regexp)
-                   (setq need-line t)
-                   ;; else if the line is a comment, do nothing
-                   (nth 4 (syntax-ppss))
-                   (setq need-line t)
-                   ;; else if this is the first line then just exit the loop
-                   (bobp)
-                   (setq need-line nil)
-                   ;; finally, there  must be text on this line... indent the
-                   ;; current line to match it!
-                   t
+                     (setq need-line nil)))
+                  ;; else if the line is totally empty, do nothing
+                  ((looking-at aql-empty-regexp)
+                   (setq need-line t))
+                  ;; else if the line is a comment, do nothing
+                  ((nth 4 (syntax-ppss))
+                   (setq need-line t))
+                  ;; else if this is the first line then just exit the loop
+                  ((bobp)
+                   (setq need-line nil))
+                  ;; finally, there  must be text on this line... indent the
+                  ;; current line to match it!
+                  (t
                    (progn
                      (setq cur-indent (current-indentation))
                      (setq need-line nil)))))))
@@ -210,9 +210,8 @@
 (define-derived-mode aql-mode c-mode
   "AQL Mode"
   "Major mode for editing Arango Query Language (AQL)"
-
-  (set (make-local-variable 'font-lock-defaults) '(aql-font-lock-keywords nil t))
-  (set (make-local-variable 'indent-line-function) 'aql-indent-line))
+  (setq-local font-lock-defaults (list aql-font-lock-keywords nil t))
+  (setq-local indent-line-function #'aql-indent-line))
 
 ;; add the mode to the features list
 (provide 'aql-mode)
